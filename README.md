@@ -16,4 +16,5 @@ TODO:
   Add verbosity to log file
   Fix CyberTip toggle
   Allow for multiple entries in same instance
+  Allow adding images and legal documents
   Make GUI prettier?
