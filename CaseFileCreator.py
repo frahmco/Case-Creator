@@ -7,8 +7,7 @@ class CaseFileCreator:
 
 
     def __init__(self):
-        pass
-        
+        pass        
 
     #Method to create directories, subdirectories, and Word Doc for report
     def createDirectories(self, caseNumber, caseAgent, items, filePath):
@@ -138,6 +137,8 @@ class CaseFileCreator:
 
         report_doc = Doc()
         report_doc.save(topDir + '/' + "MASTER_Notes.docx")
+
+
                 
 
         

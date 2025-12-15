@@ -1,5 +1,6 @@
 from tkinter import * 
 from CaseFileCreator import *
+from profile_templates import *
 from tkinter import messagebox
 from tkinter import filedialog
 from tkinter import END
@@ -17,6 +18,12 @@ class CaseGUI:
     directory = ''
     isCyberTip = BooleanVar()
 
+    profileName = ''
+    profileAgency = ''
+    profileBadgeNumber = ''
+    profileTitle = ''
+    profileDefaultPath = ''
+
     #Change this to change default CT path
     TIP_DEFAULT_PATH = "X:\\__New Cybertip triage\\"
 
@@ -29,18 +36,19 @@ class CaseGUI:
 
     def initializeWindow(self):
 
-        #Global declarations for entry boxes
+        #Global declarations for entry boxes FIX THIS IS HORRIBLE
         global caseNumberEntry
         global agentEntry
         global itemNumEntry
         global directorySelectorEntry
         global caseNumberLabel
         global agentLabel
+        global examinerInfoLabel
 
         #GUI set-up
         
         self.root_window.title("Case File Generator")
-        self.root_window.geometry('900x150')
+        self.root_window.geometry('950x250')
 
         caseNumberLabel = Label(self.root_window, text = "Case Number")
         caseNumberLabel.grid(column=0, row=0, padx=10)
@@ -68,11 +76,35 @@ class CaseGUI:
         directorySelectorButton = Button(self.root_window, text="Browse...", command=self.directoryBrowse)
         directorySelectorButton.grid(column=1, row=3)
 
+        profileButton = Button(self.root_window, text = "Edit Profile", command= self.profileCreatorWindow)
+        profileButton.grid(column=3, row = 4)
+
         isCybertipCheckbox = Checkbutton(self.root_window, text = "Cybertip", command= self.isCyberTipBoxChecked, variable= self.isCyberTip)
         isCybertipCheckbox.grid(column = 2, row = 3)
 
-        self.root_window.mainloop()
+        if not Profile.profileCheck():
+            self.profileCreatorWindow()
 
+        else:
+            profile = Profile()
+            loaded_profile = profile.readProfile()
+
+            directorySelectorEntry.insert(0, loaded_profile.getDefaultPath())
+            self.profileName = loaded_profile.getFirstName() + ' ' + profile.getLastName()
+            self.profileAgency = loaded_profile.getAgency()
+            self.profileBadgeNumber = loaded_profile.getBadgeNumber()
+            self.profileTitle = loaded_profile.getTitle()
+            self.profileDefaultPath = loaded_profile.getDefaultPath()
+
+        textBoxInfo = "User Info:\n\n" + self.profileTitle + ' ' + self.profileName + ' #' + self.profileBadgeNumber + '\n' + self.profileAgency + '\n' + self.profileDefaultPath
+        examinerInfoLabel = Label(self.root_window, text= textBoxInfo, borderwidth=1, relief=SOLID, pady=5)
+        examinerInfoLabel.grid(column= 3, row = 3)
+
+        self.root_window.mainloop()
+    def updateInfoLabel(self):
+        newText = "User Info:\n\n" + self.profileTitle + ' ' + self.profileName + ' #' + self.profileBadgeNumber + '\n' + self.profileAgency + '\n' + self.profileDefaultPath
+        examinerInfoLabel.config(text= newText)
+        
 
     def finishButtonHandler(self): #Probably can delete this
         self.finishButtonClickedAction()
@@ -121,9 +153,18 @@ class CaseGUI:
             finishButton.grid(padx=5,pady=5)
 
     def directoryBrowse(self):
-        self.directory = filedialog.askdirectory()
+        selectedDir = filedialog.askdirectory()
+        self.directory = selectedDir #THIS IS BAD PRACTICE FIX ME!!!
         directorySelectorEntry.delete(0, END)
         directorySelectorEntry.insert(0, self.directory)
+
+        if Toplevel.winfo_exists(profileEditWindow):
+            defaultPathEntryBox.delete(0, END)
+            defaultPathEntryBox.insert(0, self.directory)
+        else:
+            pass
+
+        return selectedDir
 
     def isCyberTipBoxChecked(self):
 
@@ -145,4 +186,90 @@ class CaseGUI:
             agentLabel.config(text = "Case Agent (LAST NAME ONLY)")
 
             directorySelectorEntry.delete(0, END)
+
+    def generateProfile(self):
+        fN = firstNameEntryBox.get()
+        lN = lastNameEntryBox.get()
+        a = agencyEntryBox.get()
+        bN = badgeNumberEntryBox.get()
+        t = titleEntryBox.get()
+        dP = defaultPathEntryBox.get()
+
+        profile = Profile(fN, lN, a, bN, t, dP)
+        profile.createProfile()
+
+
+
+    def profileCreatorWindow(self): #Window for Profile creation...also includes profile generation.
+        global profileEditWindow
+
+        profileEditWindow = (Toplevel())
+        profileEditWindow.attributes("-topmost", True)
+        profileEditWindow.title("Profile Editor")
+
+        global firstNameEntryBox
+        global lastNameEntryBox
+        global agencyEntryBox
+        global badgeNumberEntryBox
+        global titleEntryBox
+        global defaultPathEntryBox
+
+        firstNameLabel = Label(profileEditWindow, text="First Name")
+        firstNameLabel.grid(column= 0, row= 0)
+        firstNameEntryBox = Entry(profileEditWindow, width= 20)
+        firstNameEntryBox.grid(column = 0, row= 1, padx = 2.5)
+
+        lastNameLabel = Label(profileEditWindow, text = "Last Name")
+        lastNameLabel.grid(column=1, row = 0)
+        lastNameEntryBox = Entry(profileEditWindow, width= 20)
+        lastNameEntryBox.grid(column=1, row= 1, padx = 2.5)
+
+        agencyLabel = Label(profileEditWindow, text = "Agency")
+        agencyLabel.grid(column = 0, row = 2)
+        agencyEntryBox = Entry(profileEditWindow, width= 10)
+        agencyEntryBox.grid(column=0, row=3)
+
+        badgeNumberLabel = Label(profileEditWindow, text = "Badge Number")
+        badgeNumberLabel.grid(column=0, row=4)
+        badgeNumberEntryBox = Entry(profileEditWindow, width= 10)
+        badgeNumberEntryBox.grid()
+
+        titleLabel = Label(profileEditWindow, text="Title")
+        titleLabel.grid()
+        titleEntryBox = Entry(profileEditWindow, width= 10)
+        titleEntryBox.grid()
+
+        defaultPathLabel = Label(profileEditWindow, text="Default Save Path")
+        defaultPathLabel.grid()
+        defaultPathEntryBox = Entry(profileEditWindow, width= 50)
+        defaultPathEntryBox.grid()
+
+        def generateProfile():
+            fN = firstNameEntryBox.get()
+            lN = lastNameEntryBox.get()
+            a = agencyEntryBox.get()
+            bN = badgeNumberEntryBox.get()
+            t = titleEntryBox.get()
+            dP = defaultPathEntryBox.get()
+
+            profile = Profile(fN, lN, a, bN, t, dP)
+            profile.createProfile()
+
+            self.profileName = profile.getFirstName() + ' ' + profile.getLastName()
+            self.profileAgency = profile.getAgency()
+            self.profileBadgeNumber = profile.getBadgeNumber()
+            self.profileTitle = profile.getTitle()
+            self.profileDefaultPath = profile.getDefaultPath()
+
+            self.updateInfoLabel()
+
+            profileEditWindow.destroy()
+
+        saveButton = Button(profileEditWindow, text= "Save", command= generateProfile)
+        saveButton.grid()
+
+        browseButton = Button(profileEditWindow, text="Browse...", command= self.directoryBrowse)
+        browseButton.grid(column= 1, row = 9)
+
+
             
