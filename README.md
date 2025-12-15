@@ -15,6 +15,7 @@ Profile functionality
 
 Known issues:
   * CyberTip toggle does not create the directories properly
+  * Profile laods with out last name
 
 TODO:
   * Add verbosity to log file
