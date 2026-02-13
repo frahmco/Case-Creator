@@ -24,6 +24,7 @@ VERSION 2.1.0 UPDATE
 * Better error handling
 * More verbose logs
 * Changed GUI massively
+* Changed file names
 
 TODO:
 * Fix error handling issues
