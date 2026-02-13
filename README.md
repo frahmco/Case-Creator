@@ -17,15 +17,15 @@ Known issues:
   * CyberTip toggle does not create the directories properly
   * Issue error handling when fields left blank
 
-VERSION 2.0.0 UPDATE
+VERSION 2.1.0 UPDATE
 ------------------------
 * Completely refactored code base
 * Added attachment capabilities w/ hashing
 * Better error handling
 * More verbose logs
+* Changed GUI massively
 
 TODO:
-* Make ThreadPool for hashing function
-* Make GUI more friendly
 * Fix error handling issues
-* Restore profile functionality
+* Restore profile/settings functionality
+* Add customizable directory structure
